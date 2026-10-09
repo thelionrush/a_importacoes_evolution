@@ -1,0 +1,32 @@
+name: Monitor WhatsApp
+
+# Verifica a cada ~5 min se o WhatsApp do Disparador (Evolution) está conectado. A rota do sistema decide se avisa por e-mail
+# (só quando muda: caiu / voltou). Se a rota falhar (ex.: o e-mail não saiu), este job fica vermelho e o GitHub avisa o dono do repositório.
+# ATENÇÃO: o GitHub desliga agendamentos de repositório público após 60 dias sem atividade (push). O sistema tem um "vigia"
+# diário que avisa por e-mail se as verificações pararem; para religar: Actions → Monitor WhatsApp → Enable workflow.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: monitor-whatsapp
+  cancel-in-progress: false
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Verificar conexão do WhatsApp
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          HEALTH_URL: ${{ secrets.HEALTH_URL }}
+        run: |
+          code=$(curl -sS -o body.json -w "%{http_code}" --max-time 90 --retry 2 --retry-delay 5 --retry-all-errors \
+            -H "Authorization: Bearer $CRON_SECRET" "$HEALTH_URL")
+          echo "HTTP $code"
+          cat body.json; echo
+          [ "$code" = "200" ]

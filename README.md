@@ -16,7 +16,15 @@ vinculados. Nenhuma versão publicada do Baileys trata essa etapa, então vincul
 
 **Imagem:** `ghcr.io/thelionrush/a_importacoes_evolution:2.3.7-pairfix`
 
-**Quando remover:** assim que um Baileys publicado incluir o tratamento de `companion_reg_refresh`, voltar para a
-imagem oficial da Evolution e arquivar este repositório.
+**Quando remover o remendo:** assim que um Baileys publicado incluir o tratamento de `companion_reg_refresh`, voltar para a
+imagem oficial da Evolution. **Não arquive nem apague este repositório sem antes mover o "Monitor do WhatsApp" (abaixo)** —
+ele hospeda o agendamento do alerta de queda.
 
 Sem segredos neste repositório.
+
+## Monitor do WhatsApp (GitHub Actions)
+`.github/workflows/monitor-whatsapp.yml` chama a cada ~5 min a rota de verificação do sistema da Importações
+(`/api/cron/evolution-health`), que avisa por e-mail se o WhatsApp do Disparador cair ou voltar. Secrets do repositório:
+`CRON_SECRET` e `HEALTH_URL`. Estão aqui (e não no repositório privado do sistema) porque repositório público tem minutos de
+Actions ilimitados. **Agendamentos de repositório público são desligados após 60 dias sem push** — o "vigia" diário do sistema avisa
+por e-mail se as verificações pararem; para religar, Actions → Monitor WhatsApp → Enable workflow (ou qualquer commit).
