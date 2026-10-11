@@ -1,9 +1,10 @@
 name: Monitor WhatsApp
 
-# Verifica a cada ~5 min se o WhatsApp do Disparador (Evolution) está conectado. A rota do sistema decide se avisa por e-mail
-# (só quando muda: caiu / voltou). Se a rota falhar (ex.: o e-mail não saiu), este job fica vermelho e o GitHub avisa o dono do repositório.
-# ATENÇÃO: o GitHub desliga agendamentos de repositório público após 60 dias sem atividade (push). O sistema tem um "vigia"
-# diário que avisa por e-mail se as verificações pararem; para religar: Actions → Monitor WhatsApp → Enable workflow.
+# REFORÇO (não é o agendador principal). O agendador principal é o pg_cron do Supabase (job 'evolution-health-5min', a cada 5 min,
+# relógio confiável). Este workflow chama a mesma rota do sistema, mas o GitHub executa agendamentos de forma irregular
+# (observado: ~9 execuções em 46 h, com lacunas de 4–7 h) — por isso NÃO serve sozinho. Se a rota falhar (ex.: o e-mail não saiu),
+# este job fica vermelho e o GitHub avisa o dono do repositório por e-mail (canal independente do Resend).
+# O GitHub desliga agendamentos de repositório público após 60 dias sem push; sem problema: o pg_cron continua.
 on:
   schedule:
     - cron: "*/5 * * * *"

@@ -22,9 +22,10 @@ ele hospeda o agendamento do alerta de queda.
 
 Sem segredos neste repositório.
 
-## Monitor do WhatsApp (GitHub Actions)
-`.github/workflows/monitor-whatsapp.yml` chama a cada ~5 min a rota de verificação do sistema da Importações
-(`/api/cron/evolution-health`), que avisa por e-mail se o WhatsApp do Disparador cair ou voltar. Secrets do repositório:
-`CRON_SECRET` e `HEALTH_URL`. Estão aqui (e não no repositório privado do sistema) porque repositório público tem minutos de
-Actions ilimitados. **Agendamentos de repositório público são desligados após 60 dias sem push** — o "vigia" diário do sistema avisa
-por e-mail se as verificações pararem; para religar, Actions → Monitor WhatsApp → Enable workflow (ou qualquer commit).
+## Monitor do WhatsApp — reforço pelo GitHub Actions
+O alerta de queda do WhatsApp (Disparador) é agendado **pelo banco do Supabase** (pg_cron, a cada 5 min). O workflow
+`.github/workflows/monitor-whatsapp.yml` chama a mesma rota (`/api/cron/evolution-health`) só como **reforço**, porque o GitHub
+executa agendamentos de forma irregular (lacunas de horas). Secrets do repositório: `CRON_SECRET` e `HEALTH_URL`.
+Se a rota falhar (ex.: o e-mail do alerta não saiu), o job fica vermelho e o GitHub avisa o dono do repositório.
+Não apague os secrets nem o workflow sem necessidade; **não arquive/apague este repositório sem avisar** (a imagem remendada da
+Evolution mora aqui).
